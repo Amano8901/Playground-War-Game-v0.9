@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user information and their current game state.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "role": { "type": "string", "enum": ["Diplomat", "General", "Intelligence Director", "Economic Advisor"], "description": "Selected player role" },
+        "experience": { "type": "number", "description": "Player experience points" },
+        "currentSessionId": { "type": "string", "description": "ID of the active game session" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "GameSession": {
+      "title": "Game Session",
+      "description": "Represents a single instance of a geopolitical simulation.",
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["active", "completed"], "description": "Current status of the session" },
+        "scores": {
+          "type": "object",
+          "properties": {
+            "accountability": { "type": "number" },
+            "protection": { "type": "number" },
+            "systemicReform": { "type": "number" }
+          }
+        },
+        "hotspots": { "type": "array", "items": { "type": "string" }, "description": "List of active conflict regions" },
+        "turnCount": { "type": "number" },
+        "lastUpdated": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string", "description": "UID of the user who started the session" }
+      },
+      "required": ["status", "scores", "createdBy"]
+    },
+    "Action": {
+      "title": "Player Action",
+      "description": "A specific move made by a player in a session.",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string" },
+        "userId": { "type": "string" },
+        "role": { "type": "string" },
+        "description": { "type": "string" },
+        "impact": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sessionId", "userId", "description", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and settings."
+    },
+    "/sessions/{sessionId}": {
+      "schema": "GameSession",
+      "description": "Active and archived game sessions."
+    },
+    "/sessions/{sessionId}/actions/{actionId}": {
+      "schema": "Action",
+      "description": "History of actions within a specific session."
+    }
+  }
+}
